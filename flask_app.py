@@ -1,12 +1,11 @@
 import telebot
 from flask import Flask, request
 
-TOKEN = '8270894240:AAEv2LJRnE2jzesthGiKYLeLvi6MwRK366k'
+TOKEN = '8270894240:AAEv2LJRnE2jzesthGiKYLeLvi6MwRK366k' # Token Anda
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
-# Ganti 'kazuekurosaki' dengan username GitHub Anda jika berbeda
-WEB_APP_URL = "https://kazuekurosaki.github.io/zentrix-ai-hub/"
+URL_WEBHOOK = 'https://kazuekurosaki.pythonanywhere.com/'
 
 @app.route('/' + TOKEN, methods=['POST'])
 def getMessage():
@@ -18,22 +17,16 @@ def getMessage():
 @app.route("/")
 def webhook():
     bot.remove_webhook()
-    # Ganti 'usernameanda' dengan username PythonAnywhere Anda nanti
-    bot.set_webhook(url='https://kazuekurosaki.pythonanywhere.com/' + TOKEN)
-    return "Webhook Set!", 200
+    status = bot.set_webhook(url=URL_WEBHOOK + TOKEN)
+    if status:
+        return "Zentrix Bot is Active!", 200
+    else:
+        return "Webhook Setup Failed!", 500
 
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = telebot.types.InlineKeyboardMarkup()
-    btn = telebot.types.InlineKeyboardButton(text="🚀 Open Zentrix Dashboard", url=WEB_APP_URL)
+    url_web = "https://kazuekurosaki.github.io/zentrix-ai-hub/"
+    btn = telebot.types.InlineKeyboardButton(text="🚀 Open Dashboard", url=url_web)
     markup.add(btn)
-    
-    bot.send_message(
-        message.chat.id, 
-        "Welcome to *Zentrix AI Hub*.\n\nPremium AI Assistant for Global Users.", 
-        parse_mode='Markdown', 
-        reply_markup=markup
-    )
-
-if __name__ == "__main__":
-    app.run()
+    bot.send_message(message.chat.id, "Welcome to *Zentrix AI Premium*.\nClick below to start.", parse_mode='Markdown', reply_markup=markup)
